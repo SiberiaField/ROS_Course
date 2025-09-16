@@ -1,0 +1,8 @@
+ROS_VERSION=2
+ROS_PYTHON_VERSION=3
+AMENT_PREFIX_PATH=/opt/ros/humble
+PYTHONPATH=/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages
+LD_LIBRARY_PATH=/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib
+ROS_LOCALHOST_ONLY=1
+PATH=/home/siberia-field/geckodriver-v0.36.0-linux64:/home/siberia-field/geckodriver-v0.36.0-linux64:/home/siberia-field/.local/bin:/opt/ros/humble/bin:/home/siberia-field/geckodriver-v0.36.0-linux64:/home/siberia-field/miniconda3/bin:/home/siberia-field/miniconda3/condabin:/home/siberia-field/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin
+ROS_DISTRO=humble
