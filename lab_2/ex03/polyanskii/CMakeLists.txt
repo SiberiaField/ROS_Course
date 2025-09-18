@@ -13,13 +13,15 @@ find_package(std_msgs REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
-add_executable(my_node src/my_node.cpp)
-target_include_directories(my_node PUBLIC
+add_executable(polyanskii_node src/polyanskii_node.cpp)
+target_include_directories(polyanskii_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-target_compile_features(my_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+target_compile_features(polyanskii_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
-install(TARGETS my_node
+ament_target_dependencies(polyanskii_node std_msgs rclcpp)
+
+install(TARGETS polyanskii_node
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
