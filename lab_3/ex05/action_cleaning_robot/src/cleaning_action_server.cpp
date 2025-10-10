@@ -152,10 +152,8 @@ private:
     rclcpp::Rate wait_pose_update_rate(1);
     wait_for_turtle_stop(wait_pose_update_rate);
     
-    double start_x = curr_p.x;
-    double start_y = curr_p.y;
-    double goal_vec_x = round_n(x - start_x, 3);
-    double goal_vec_y = round_n(y - start_y, 3);
+    double goal_vec_x = round_n(x - curr_p.x, 3);
+    double goal_vec_y = round_n(y - curr_p.y, 3);
     double goal_dist = vec_len(goal_vec_x, goal_vec_y);
     if (goal_dist <= 0.1) {
       result->success = true;
