@@ -12,15 +12,19 @@
 using std::placeholders::_1;
 
 
-double min_angle(double a, double b){
-    double angle1 = a - b;
-    double angle2 = b - a + 2*3.14;
-    return (angle1 > angle2) ? angle2 : angle1;
+double min_angle(double alpha, double beta){
+    // double theta = std::fmod(beta - alpha + 3.14, 2 * 3.14)
+    return std::fmod(beta - alpha + 3.14, 2 * 3.14) - 3.14;
 }
 
 
 double vec_len(double x, double y){
     return sqrt(pow(x, 2) + pow(y, 2));
+}
+
+
+double angle_between_vectors(double x1, double y1, double x2, double y2){
+    return acos((x1*x2 + y1*y2) / (vec_len(x1, y1) * vec_len(x2, y2)));
 }
 
 
@@ -44,26 +48,32 @@ public:
 private:
     void reach_the_goal(const turtlesim::msg::Pose & p){
         if ((p.linear_velocity == 0) && (p.angular_velocity == 0)){
-            double goal_vec_x = round_n(goal_x - p.x, 3);
-            double goal_vec_y = round_n(goal_y - p.y, 3);
-            double goal_dist = vec_len(goal_vec_x, goal_vec_y);
+            goal_vec_x = round_n(goal_x - p.x, 3);
+            goal_vec_y = round_n(goal_y - p.y, 3);
+            goal_dist = vec_len(goal_vec_x, goal_vec_y);
 
-            geometry_msgs::msg::Twist twist;
-            if (goal_dist > 0.1){
-                RCLCPP_DEBUG(this->get_logger(), "goal_vec = (%f, %f), with len = %f", goal_vec_x, goal_vec_y, goal_dist);
-                if (abs(p.theta) > 1e-3){
-                    twist.angular.z = -p.theta;
+            if (goal_dist > 0.1) {
+                turtle_vec_x = cos(p.theta);
+                turtle_vec_y = sin(p.theta);
+                alpha = angle_between_vectors(goal_vec_x, goal_vec_y, turtle_vec_x, turtle_vec_y);
+                direction = turtle_vec_x * goal_vec_y - turtle_vec_y * goal_vec_x;
+                if (direction < 0) {
+                    alpha = -alpha;
+                }
+
+                if (abs(alpha) >= 1e-2) {
+                    twist.angular.z = alpha;
                     twist.linear.x = twist.linear.y = 0;
+                    publisher_->publish(twist);
                 } else {
                     twist.angular.z = 0;
-                    twist.linear.x = goal_vec_x;
-                    twist.linear.y = goal_vec_y;
+                    twist.linear.x = goal_dist;
+                    twist.linear.y = 0;
                 }
                 publisher_->publish(twist);
             }
-            else if (abs(min_angle(final_theta, p.theta)) > 1e-2){
-                RCLCPP_DEBUG(this->get_logger(), "Theta %f", p.theta);
-                twist.angular.z = round_n(min_angle(final_theta, p.theta), 3);
+            else if (abs(min_angle(p.theta, final_theta)) >= 1e-2) {
+                twist.angular.z = min_angle(p.theta, final_theta);
                 twist.linear.x = twist.linear.y = 0;
                 publisher_->publish(twist);
             }
@@ -76,7 +86,11 @@ private:
 
     rclcpp::Subscription<turtlesim::msg::Pose>::SharedPtr subscription_;
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr publisher_;
+    geometry_msgs::msg::Twist twist;
     double goal_x, goal_y, final_theta;
+    double goal_vec_x, goal_vec_y, goal_dist;
+    double turtle_vec_x, turtle_vec_y;
+    double alpha, direction;
 };
 
 
