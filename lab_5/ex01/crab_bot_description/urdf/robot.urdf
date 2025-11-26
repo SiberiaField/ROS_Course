@@ -1,0 +1,381 @@
+<?xml version="1.0"?>
+<robot name="crab_bot">
+
+  <material name="red">
+    <color rgba="0.8 0 0 1"/>
+  </material>
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.2 0.2 0.2"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.2 0.2 0.2"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="2"/>
+      <inertia ixx="0.01333" ixy="0.0" ixz="0.0" iyy="0.01333" iyz="0.0" izz="0.01333"/>
+    </inertial>
+  </link>
+
+  <link name="base_footprint"/>
+  <joint name="base_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_footprint"/>
+    <origin xyz="0.0 0.0 -0.1175" rpy="0 0 0"/>
+  </joint>
+
+  <link name="right_eye">
+    <visual>
+      <geometry>
+        <cylinder length="0.05" radius="0.035"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0.025 0 0"/>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.05" radius="0.035"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0.025 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.000026" ixy="0.0" ixz="0.0" iyy="0.000026" iyz="0.0" izz="0.00003"/>
+      <origin rpy="0 1.57075 0" xyz="0.025 0 0"/>
+    </inertial>
+  </link>
+  <joint name="base_to_right_eye" type="fixed">
+    <parent link="base_link"/>
+    <child link="right_eye"/>
+    <origin xyz="0.1 -0.045 0.1"/>
+  </joint>
+
+  <link name="left_eye">
+    <visual>
+      <geometry>
+        <cylinder length="0.05" radius="0.035"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0.025 0 0"/>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.05" radius="0.035"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0.025 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.000026" ixy="0.0" ixz="0.0" iyy="0.000026" iyz="0.0" izz="0.00003"/>
+      <origin rpy="0 1.57075 0" xyz="0.025 0 0"/>
+    </inertial>
+  </link>
+  <joint name="base_to_left_eye" type="fixed">
+    <parent link="base_link"/>
+    <child link="left_eye"/>
+    <origin xyz="0.1 0.045 0.1"/>
+  </joint>
+
+  <link name="right_arm">
+    <visual>
+      <geometry>
+        <box size="0.1 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 0 1.57075" xyz="0 -0.05 0"/>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.1 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 0 1.57075" xyz="0 -0.05 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.00005" ixy="0.0" ixz="0.0" iyy="0.000021" iyz="0.0" izz="0.00005"/>
+      <origin rpy="0 0 1.57075" xyz="0 -0.05 0"/>
+    </inertial>
+  </link>
+  <joint name="base_to_right_arm" type="continuous">
+    <axis xyz="0 1 0"/>
+    <parent link="base_link"/>
+    <child link="right_arm"/>
+    <origin xyz="0 -0.1 0.075"/>
+  </joint>
+
+  <link name="right_forearm">
+    <visual>
+      <geometry>
+        <box size="0.1 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.05"/>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.1 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.05"/>
+    </collision>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.00005" ixy="0.0" ixz="0.0" iyy="0.000021" iyz="0.0" izz="0.00005"/>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.05"/>
+    </inertial>
+  </link>
+  <joint name="right_forearm_joint" type="fixed">
+    <parent link="right_arm"/>
+    <child link="right_forearm"/>
+    <origin xyz="0 -0.075 0.025"/>
+  </joint>
+
+  <link name="right_small_finger">
+    <visual>
+      <geometry>
+        <box size="0.04 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.02"/>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.04 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.02"/>
+    </collision>
+    <inertial>
+      <mass value="0.025"/>
+      <inertia ixx="0.0000171" ixy="0.0" ixz="0.0" iyy="0.000021" iyz="0.0" izz="0.0000171"/>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.02"/>
+    </inertial>
+  </link>
+  <joint name="right_small_finger_joint" type="fixed">
+    <parent link="right_forearm"/>
+    <child link="right_small_finger"/>
+    <origin xyz="0 0.025 0.1"/>
+  </joint>
+
+  <link name="right_big_finger">
+    <visual>
+      <geometry>
+        <box size="0.07 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.035"/>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.07 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.035"/>
+    </collision>
+    <inertial>
+      <mass value="0.04"/>
+      <inertia ixx="0.000031" ixy="0.0" ixz="0.0" iyy="0.000021" iyz="0.0" izz="0.000031"/>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.035"/>
+    </inertial>
+  </link>
+  <joint name="right_big_finger_joint" type="fixed">
+    <parent link="right_forearm"/>
+    <child link="right_big_finger"/>
+    <origin xyz="0 -0.025 0.1"/>
+  </joint>
+
+  <link name="left_arm">
+    <visual>
+      <geometry>
+        <box size="0.1 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 0 1.57075" xyz="0 0.05 0"/>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.1 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 0 1.57075" xyz="0 0.05 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.00005" ixy="0.0" ixz="0.0" iyy="0.000021" iyz="0.0" izz="0.00005"/>
+      <origin rpy="0 0 1.57075" xyz="0 0.05 0"/>
+    </inertial>
+  </link>
+  <joint name="base_to_left_arm" type="continuous">
+    <axis xyz="0 1 0"/>
+    <parent link="base_link"/>
+    <child link="left_arm"/>
+    <origin xyz="0 0.1 0.075"/>
+  </joint>
+
+  <link name="left_forearm">
+    <visual>
+      <geometry>
+        <box size="0.1 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.05"/>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.1 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.05"/>
+    </collision>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.00005" ixy="0.0" ixz="0.0" iyy="0.000021" iyz="0.0" izz="0.00005"/>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.05"/>
+    </inertial>
+  </link>
+  <joint name="left_forearm_joint" type="fixed">
+    <parent link="left_arm"/>
+    <child link="left_forearm"/>
+    <origin xyz="0 0.075 0.025"/>
+  </joint>
+
+  <link name="left_small_finger">
+    <visual>
+      <geometry>
+        <box size="0.04 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.02"/>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.04 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.02"/>
+    </collision>
+    <inertial>
+      <mass value="0.025"/>
+      <inertia ixx="0.0000171" ixy="0.0" ixz="0.0" iyy="0.000021" iyz="0.0" izz="0.0000171"/>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.02"/>
+    </inertial>
+  </link>
+  <joint name="left_small_finger_joint" type="fixed">
+    <parent link="left_forearm"/>
+    <child link="left_small_finger"/>
+    <origin xyz="0 -0.025 0.1"/>
+  </joint>
+
+  <link name="left_big_finger">
+    <visual>
+      <geometry>
+        <box size="0.07 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.035"/>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.07 0.05 0.05"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.035"/>
+    </collision>
+    <inertial>
+      <mass value="0.04"/>
+      <inertia ixx="0.000031" ixy="0.0" ixz="0.0" iyy="0.000021" iyz="0.0" izz="0.000031"/>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.035"/>
+    </inertial>
+  </link>
+  <joint name="left_big_finger_joint" type="fixed">
+    <parent link="left_forearm"/>
+    <child link="left_big_finger"/>
+    <origin xyz="0 0.025 0.1"/>
+  </joint>
+
+  <link name="right_back_wheel">
+    <visual>
+      <geometry>
+        <cylinder length="0.025" radius="0.035"/>
+      </geometry>
+      <origin rpy="1.57075 0 0"/>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.025" radius="0.035"/>
+      </geometry>
+      <origin rpy="1.57075 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.02"/>
+      <inertia ixx="0.0000071677" ixy="0.0" ixz="0.0" iyy="0.0000071677" iyz="0.0" izz="0.00001225"/>
+      <origin rpy="1.57075 0 0"/>
+    </inertial>
+  </link>
+  <joint name="right_back_wheel_joint" type="continuous">
+    <axis xyz="0 1 0"/>
+    <parent link="base_link"/>
+    <child link="right_back_wheel"/>
+    <origin xyz="-0.065 -0.1125 -0.1"/>
+  </joint>
+
+  <link name="left_back_wheel">
+    <visual>
+      <geometry>
+        <cylinder length="0.025" radius="0.035"/>
+      </geometry>
+      <origin rpy="1.57075 0 0"/>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.025" radius="0.035"/>
+      </geometry>
+      <origin rpy="1.57075 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.02"/>
+      <inertia ixx="0.0000071677" ixy="0.0" ixz="0.0" iyy="0.0000071677" iyz="0.0" izz="0.00001225"/>
+      <origin rpy="1.57075 0 0"/>
+    </inertial>
+  </link>
+  <joint name="left_back_wheel_joint" type="continuous">
+    <axis xyz="0 1 0"/>
+    <parent link="base_link"/>
+    <child link="left_back_wheel"/>
+    <origin xyz="-0.065 0.1125 -0.1"/>
+  </joint>
+
+  <link name="front_caster">
+    <visual>
+      <geometry>
+        <sphere radius="0.035"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.035"/>
+      </geometry>
+      <origin rpy="1.57075 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.04"/>
+      <inertia ixx="0.0000196" ixy="0.0" ixz="0.0" iyy="0.0000196" iyz="0.0" izz="0.0000196"/>
+    </inertial>
+  </link>
+  <joint name="caster_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_caster"/>
+    <origin xyz="0.065 0 -0.1"/>
+  </joint>
+
+</robot>
