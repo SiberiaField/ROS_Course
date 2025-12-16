@@ -1,0 +1,329 @@
+<?xml version="1.0"?>
+<robot name="crab_bot" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find crab_bot_description)/urdf/gazebo.urdf.xacro" />
+
+  <!-- Colors -->
+  <material name="red">
+    <color rgba="0.8 0 0 1"/>
+  </material>
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+
+
+  <!-- Base properties -->
+  <xacro:property name="base_depth" value="0.2"/>
+  <xacro:property name="base_width" value="0.2"/>
+  <xacro:property name="base_height" value="0.2"/>
+  <xacro:property name="base_weight" value="2"/>
+  <xacro:property name="base_volume" value="${base_depth * base_width * base_height * 100}"/>
+
+
+  <!-- Cylinder properties -->
+  <xacro:macro name="cylinder_properties" params="prefix r l">
+    <xacro:property name="${prefix}_radius" value="${r}" scope="global"/>
+    <xacro:property name="${prefix}_length" value="${l}" scope="global"/>
+    <xacro:property name="${prefix}_weight" value="${((pi*r*r * l * 100) / base_volume) * base_weight}" scope="global"/>
+  </xacro:macro>
+
+
+  <!-- Box properties -->
+  <xacro:macro name="box_properties" params="prefix d w h">
+    <xacro:property name="${prefix}_depth" value="${d}" scope="global"/>
+    <xacro:property name="${prefix}_width" value="${w}" scope="global"/>
+    <xacro:property name="${prefix}_height" value="${h}" scope="global"/>
+    <xacro:property name="${prefix}_weight" value="${((d * w * h * 100) / base_volume) * base_weight}" scope="global"/>
+  </xacro:macro>
+
+
+  <!-- Inertia xacros -->
+  <xacro:macro name="box_inertia" params="m w h d">
+    <mass value="${m}"/>
+    <inertia ixx="${(m/12) * (h*h + d*d)}" ixy="0.0" ixz="0.0" iyy="${(m/12) * (w*w + d*d)}" iyz="0.0" izz="${(m/12) * (w*w + h*h)}"/>
+  </xacro:macro>
+
+  <xacro:macro name="cylinder_inertia" params="m r l">
+    <mass value="${m}"/>
+    <inertia ixx="${(m/12) * (3*r*r + l*l)}" ixy = "0" ixz = "0" iyy="${(m/12) * (3*r*r + l*l)}" iyz = "0" izz="${(m/2) * (r*r)}"/>
+  </xacro:macro>
+
+  <xacro:macro name="sphere_inertia" params="m r">
+    <mass value="${m}"/>
+    <inertia ixx="${(2/5) * m * (r*r)}" ixy="0.0" ixz="0.0" iyy="${(2/5) * m * (r*r)}" iyz="0.0" izz="${(2/5) * m * (r*r)}"/>
+  </xacro:macro>
+
+
+  <!-- Robot base link -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="${base_depth} ${base_width} ${base_height}"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${base_depth} ${base_width} ${base_height}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <xacro:box_inertia m="${base_weight}" w="${base_width}" h="${base_height}" d="${base_depth}"/>
+    </inertial>
+  </link>
+
+
+  <!-- Eyes -->
+  <xacro:cylinder_properties prefix="eye" r="0.035" l="0.05"/>
+
+  <xacro:macro name="eye" params="prefix y_reflect">
+    <link name="${prefix}_eye">
+      <visual>
+        <geometry>
+          <cylinder radius="${eye_radius}" length="${eye_length}"/>
+        </geometry>
+        <origin rpy="0 ${pi/2} 0" xyz="${eye_length/2} 0 0"/>
+        <material name="white"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder radius="${eye_radius}" length="${eye_length}"/>
+        </geometry>
+        <origin rpy="0 ${pi/2} 0" xyz="${eye_length/2} 0 0"/>
+      </collision>
+      <inertial>
+        <xacro:cylinder_inertia m="${eye_weight}" r="${eye_radius}" l="${eye_length}"/>
+        <origin rpy="0 ${pi/2} 0" xyz="${eye_length/2} 0 0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}_eye_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="${prefix}_eye"/>
+      <origin xyz="${base_depth/2} ${y_reflect * eye_radius} ${base_height/2}"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:eye prefix="right" y_reflect="-1"/>
+  <xacro:eye prefix="left" y_reflect="1"/>
+
+
+  <!-- Arms -->
+  <xacro:box_properties prefix="arm" d="0.1" w="0.05" h="0.05"/>
+
+  <xacro:macro name="arm" params="prefix y_reflect">
+    <link name="${prefix}_arm">
+      <visual>
+        <geometry>
+          <box size="${arm_depth} ${arm_width} ${arm_height}"/>
+        </geometry>
+        <origin rpy="0 0 ${pi/2}" xyz="0 ${y_reflect * arm_width} 0"/>
+        <material name="red"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${arm_depth} ${arm_width} ${arm_height}"/>
+        </geometry>
+        <origin rpy="0 0 ${pi/2}" xyz="0 ${y_reflect * arm_width} 0"/>
+      </collision>
+      <inertial>
+        <xacro:box_inertia m="${arm_weight}" w="${arm_width}" h="${arm_height}" d="${arm_depth}"/>
+        <origin rpy="${pi/2} ${pi/2} 0" xyz="0 ${y_reflect * arm_width} 0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}_arm_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="${prefix}_arm"/>
+      <origin xyz="0 ${y_reflect * (base_width/2)} ${(base_height/2) - (arm_height/2)}"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:arm prefix="right" y_reflect="-1"/>
+  <xacro:arm prefix="left" y_reflect="1"/>
+
+
+  <!-- Forearms -->
+  <xacro:box_properties prefix="forearm" d="0.1" w="0.05" h="0.05"/>
+
+  <xacro:macro name="forearm" params="prefix y_reflect">
+    <link name="${prefix}_forearm">
+      <visual>
+        <geometry>
+          <box size="${forearm_depth} ${forearm_width} ${forearm_height}"/>
+        </geometry>
+        <origin rpy="0 ${pi/2} 0" xyz="0 0 ${forearm_depth/2}"/>
+        <material name="red"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${forearm_depth} ${forearm_width} ${forearm_height}"/>
+        </geometry>
+        <origin rpy="0 ${pi/2} 0" xyz="0 0 ${forearm_depth/2}"/>
+      </collision>
+      <inertial>
+        <xacro:box_inertia m="${forearm_weight}" w="${forearm_width}" h="${forearm_height}" d="${forearm_depth}"/>
+        <origin rpy="0 0 ${pi/2}" xyz="0 0 ${forearm_depth/2}"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}_forearm_joint" type="fixed">
+      <parent link="${prefix}_arm"/>
+      <child link="${prefix}_forearm"/>
+      <origin xyz="0 ${y_reflect * (arm_depth - (forearm_width/2))} ${forearm_height/2}"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:forearm prefix="right" y_reflect="-1"/>
+  <xacro:forearm prefix="left" y_reflect="1"/>
+
+
+  <!-- Short Fingers -->
+  <xacro:box_properties prefix="short_finger" d="0.04" w="0.05" h="0.05"/>
+
+  <xacro:macro name="short_finger" params="prefix y_reflect">
+    <link name="${prefix}_short_finger">
+      <visual>
+        <geometry>
+          <box size="${short_finger_depth} ${short_finger_width} ${short_finger_height}"/>
+        </geometry>
+        <origin rpy="0 ${pi/2} 0" xyz="0 0 ${short_finger_depth/2}"/>
+        <material name="red"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${short_finger_depth} ${short_finger_width} ${short_finger_height}"/>
+        </geometry>
+        <origin rpy="0 ${pi/2} 0" xyz="0 0 ${short_finger_depth/2}"/>
+      </collision>
+      <inertial>
+        <xacro:box_inertia m="${short_finger_weight}" w="${short_finger_width}" 
+                           h="${short_finger_height}" d="${short_finger_depth}"/>
+        <origin rpy="0 0 ${pi/2}" xyz="0 0 ${short_finger_depth/2}"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}_short_finger_joint" type="fixed">
+      <parent link="${prefix}_forearm"/>
+      <child link="${prefix}_short_finger"/>
+      <origin xyz="0 ${y_reflect * (short_finger_width/2)} ${forearm_depth}"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:short_finger prefix="right" y_reflect="1"/>
+  <xacro:short_finger prefix="left" y_reflect="-1"/>
+
+
+  <!-- Long Fingers -->
+    <xacro:box_properties prefix="long_finger" d="0.07" w="0.05" h="0.05"/>
+
+  <xacro:macro name="long_finger" params="prefix y_reflect">
+    <link name="${prefix}_long_finger">
+      <visual>
+        <geometry>
+          <box size="${long_finger_depth} ${long_finger_width} ${long_finger_height}"/>
+        </geometry>
+        <origin rpy="0 ${pi/2} 0" xyz="0 0 ${long_finger_depth/2}"/>
+        <material name="red"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${long_finger_depth} ${long_finger_width} ${long_finger_height}"/>
+        </geometry>
+        <origin rpy="0 ${pi/2} 0" xyz="0 0 ${long_finger_depth/2}"/>
+      </collision>
+      <inertial>
+        <xacro:box_inertia m="${long_finger_weight}" w="${long_finger_width}" 
+                           h="${long_finger_height}" d="${long_finger_depth}"/>
+        <origin rpy="0 0 ${pi/2}" xyz="0 0 ${long_finger_depth/2}"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}_long_finger_joint" type="fixed">
+      <parent link="${prefix}_forearm"/>
+      <child link="${prefix}_long_finger"/>
+      <origin xyz="0 ${y_reflect * (long_finger_width/2)} ${forearm_depth}"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:long_finger prefix="right" y_reflect="-1"/>
+  <xacro:long_finger prefix="left" y_reflect="1"/>
+
+
+  <!-- Wheels -->
+  <xacro:cylinder_properties prefix="wheel" r="0.035" l="0.025"/>
+
+  <xacro:macro name="wheel" params="prefix y_reflect">
+    <link name="${prefix}_wheel">
+      <visual>
+        <geometry>
+          <cylinder length="${wheel_length}" radius="${wheel_radius}"/>
+        </geometry>
+        <origin rpy="${pi/2} 0 0"/>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="${wheel_length}" radius="${wheel_radius}"/>
+        </geometry>
+        <origin rpy="${pi/2} 0 0"/>
+      </collision>
+      <inertial>
+        <xacro:cylinder_inertia m="${wheel_weight}" r="${wheel_radius}" l="${wheel_length}"/>
+        <origin rpy="${pi/2} 0 0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}_wheel_joint" type="continuous">
+      <axis xyz="0 1 0"/>
+      <parent link="base_link"/>
+      <child link="${prefix}_wheel"/>
+      <origin xyz="${-((base_depth/2) - wheel_radius)} ${y_reflect * ((base_width/2) + wheel_length/2)} ${-base_height/2}"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:wheel prefix="right" y_reflect="-1"/>
+  <xacro:wheel prefix="left" y_reflect="1"/>
+
+
+  <!-- Base Footprint -->
+  <link name="base_footprint"/>
+  <joint name="base_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_footprint"/>
+    <origin xyz="0.0 0.0 ${-((base_height/2) + wheel_radius)}"/>
+  </joint>
+
+
+  <!-- Front Caster -->
+  <xacro:property name="front_caster_radius" value="${wheel_radius}"/>
+  <xacro:property name="front_caster_volume" value="${(4/3)*pi*front_caster_radius*front_caster_radius*front_caster_radius * 100}"/>
+  <xacro:property name="front_caster_weight" value="${(front_caster_volume / base_volume) * base_weight}"/>
+
+  <link name="front_caster">
+    <visual>
+      <geometry>
+        <sphere radius="${front_caster_radius}"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="${front_caster_radius}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <xacro:sphere_inertia m="${front_caster_weight}" r="${front_caster_radius}"/>
+    </inertial>
+  </link>
+  <joint name="front_caster_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_caster"/>
+    <origin xyz="${(base_depth/2) - front_caster_radius} 0 ${-base_height/2}"/>
+  </joint>
+
+  <gazebo reference="front_caster">
+    <material>Gazebo/White</material>
+    <mu1 value="0.001"/>
+    <mu2 value="0.001"/>
+  </gazebo>
+</robot>
